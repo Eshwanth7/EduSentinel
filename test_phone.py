@@ -1,9 +1,10 @@
 import cv2
 import time
 
-FACE_CASCADE = cv2.CascadeClassifier(
-    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-)
+from core.cv_support import resolve_haar_cascade_path
+
+FACE_CASCADE_PATH = resolve_haar_cascade_path("haarcascade_frontalface_default.xml")
+FACE_CASCADE = cv2.CascadeClassifier(FACE_CASCADE_PATH) if FACE_CASCADE_PATH else None
 
 cap = cv2.VideoCapture(0)
 print("Testing face detection...")
@@ -17,6 +18,10 @@ for i in range(10):
     ret, frame = cap.read()
     if not ret:
         print("Camera error!")
+        break
+
+    if FACE_CASCADE is None:
+        print("Face cascade XML not available; skipping detection.")
         break
 
     gray  = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

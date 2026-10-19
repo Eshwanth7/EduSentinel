@@ -42,6 +42,9 @@ EDUCATIONAL = [
     "microsoft teams", "onenote", "sharepoint",
     "lecture", "assignment", "textbook", "syllabus",
     "exam", "quiz", "study", "course", "chapter",
+    "reading", "readings", "reading list", "study guide",
+    "notes", "note", "study material", "ebook", "e-book", "pdf",
+    "article", "essay", "assessment", "evaluation",
     "mathematics", "physics", "chemistry", "biology",
     "history", "geography", "engineering",
     "research paper", "thesis", "journal",
@@ -70,8 +73,10 @@ PROGRAMMING_LANGUAGES = [
 # Study context words — if any of these appear with a programming language = educational
 STUDY_CONTEXT = [
     "tutorial", "course", "learn", "lecture", "study",
+    "reading", "readings", "reading list", "notes", "study guide",
     "documentation", "docs", "guide", "how to", "beginner",
     "advanced", "practice", "exercise", "project", "assignment",
+    "assessment", "evaluation", "test", "quiz", "exam",
     "stackoverflow", "github", "geeksforgeeks", "w3schools",
     "codecademy", "udemy", "coursera", "nptel", "freecodecamp",
     "notebook", "jupyter", "pycharm", "vs code", "ide",
@@ -117,10 +122,8 @@ class ContentClassifier:
 
         # ── Step 3: Programming language + study context check ────────────
         # e.g. "Python tutorial", "Learn Java", "Python - Stack Overflow"
-        has_lang = any(
-            re.search(rf"\b{re.escape(lang)}\b", t)
-            for lang in PROGRAMMING_LANGUAGES
-        )
+        # Use substring matching so languages like C++ and C# still match reliably.
+        has_lang = any(lang in t for lang in PROGRAMMING_LANGUAGES)
         has_study = any(ctx in t for ctx in STUDY_CONTEXT)
         if has_lang and has_study:
             return "educational"

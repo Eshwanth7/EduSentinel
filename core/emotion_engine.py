@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 from collections import Counter
 
+from core.cv_support import resolve_haar_cascade_path
+
 EMOTION_MAP = {
     "happy":   "active",
     "surprise":"active",
@@ -12,9 +14,8 @@ EMOTION_MAP = {
     "disgust": "passive"
 }
 
-FACE_CASCADE = cv2.CascadeClassifier(
-    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-)
+FACE_CASCADE_PATH = resolve_haar_cascade_path("haarcascade_frontalface_default.xml")
+FACE_CASCADE = cv2.CascadeClassifier(FACE_CASCADE_PATH) if FACE_CASCADE_PATH else None
 
 class EmotionEngine:
     def __init__(self):
@@ -26,6 +27,8 @@ class EmotionEngine:
 
     def _has_face(self, frame: np.ndarray) -> bool:
         """OpenCV face detection — fast and reliable."""
+        if FACE_CASCADE is None:
+            return False
         try:
             gray  = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             gray  = cv2.equalizeHist(gray)
@@ -37,7 +40,7 @@ class EmotionEngine:
             )
             return len(faces) > 0
         except:
-            return True
+            return False
 
     def analyze(self, frame: np.ndarray) -> str:
         """Detects emotion. Also tracks face presence as a side effect."""
